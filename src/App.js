@@ -1,10 +1,11 @@
 import React from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Route, Switch, Redirect } from "react-router-dom";
+import { Container, Row } from "react-bootstrap";
 import NavigationBar from "./components/navigationBar";
 import Login from "./components/login";
 import Items from "./components/items";
 import Customers from "./components/customers";
-import SideNav from "./components/sideNav";
+import NotFound from "./components/notFound";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
@@ -14,10 +15,13 @@ function App() {
       <NavigationBar />
       <Container fluid>
         <Row>
-          {/* <SideNav /> */}
-          <Login />
-          {/* <Items /> */}
-          {/* <Customers /> */}
+          <Switch>
+            <Route path="/login" component={Login} />
+            <Route path="/customers" component={Customers} />
+            <Route path="/items" component={Items} />
+            <Route path="/" exact component={Login} />
+            <Redirect to="/not-found" component={NotFound} />
+          </Switch>
         </Row>
       </Container>
     </React.Fragment>

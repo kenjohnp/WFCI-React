@@ -60,6 +60,7 @@ class Items extends Component {
 
     return (
       <React.Fragment>
+        <Col md="2"></Col>
         <Col className="p-5 w-75" md="8">
           <h2>
             Items <span className="d-inline h-5">({totalCount} items)</span>

@@ -59,6 +59,7 @@ class Customers extends Component {
 
     return (
       <React.Fragment>
+        <Col md="2"></Col>
         <Col className="p-5 w-75" md="8">
           <h2>Customers</h2>
           <Row className="justify-content-between">
