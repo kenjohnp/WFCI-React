@@ -1,16 +1,18 @@
 import React, { Component } from "react";
-import { Col, Row, Table, Button, InputGroup, Form } from "react-bootstrap";
+import { Col, Row, Table, Button } from "react-bootstrap";
 import { getCustomers } from "../services/fakeCustomerService";
 import { paginate } from "../utils/paginate";
 import _ from "lodash";
 import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
 import PaginationBar from "./common/paginationBar";
+import SearchBox from "./common/searchBox";
 
 class Customers extends Component {
   state = {
     customers: [],
     sortColumn: { path: "name", order: "asc" },
+    searchQuery: "",
     pageSize: 8,
     currentPage: 1
   };
@@ -18,13 +20,31 @@ class Customers extends Component {
   columns = [
     { path: "name", label: "Customer Name" },
     { path: "address", label: "Address" },
-    { path: "tinNo", label: "TIN No" }
+    {
+      key: "delete",
+      content: item => (
+        <Button
+          className="btn-danger btn-sm"
+          onClick={() => this.handleDelete(item)}
+        >
+          Delete
+        </Button>
+      )
+    }
   ];
 
   async componentDidMount() {
     const customers = await getCustomers();
     this.setState({ customers });
   }
+
+  handleDelete = item => {
+    console.log(item);
+  };
+
+  handleSearch = query => {
+    this.setState({ searchQuery: query, currentPage: 1 });
+  };
 
   handleSort = sortColumn => {
     this.setState({ sortColumn });
@@ -39,14 +59,17 @@ class Customers extends Component {
       pageSize,
       currentPage,
       customers: allCustomers,
-      sortColumn
+      sortColumn,
+      searchQuery
     } = this.state;
 
-    const sorted = _.orderBy(
-      allCustomers,
-      [sortColumn.path],
-      [sortColumn.order]
-    );
+    let filtered = allCustomers;
+    if (searchQuery)
+      filtered = allCustomers.filter(c =>
+        c.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+
+    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
     const customers = paginate(sorted, currentPage, pageSize);
 
@@ -54,29 +77,22 @@ class Customers extends Component {
   }
 
   render() {
-    const { sortColumn, pageSize, currentPage } = this.state;
+    const { sortColumn, pageSize, currentPage, searchQuery } = this.state;
     const { totalCount, data: customers } = this.getPagedData();
 
     return (
       <React.Fragment>
-        <Col md="2"></Col>
-        <Col className="p-5 w-75" md="8">
+        <Col xl="1"></Col>
+        <Col className="p-5 w-75" xl="10" md="12">
           <h2>Customers</h2>
           <Row className="justify-content-between">
             <Button className="m-2 btn-primary">
               <i className="fa fa-plus-square"></i> New Customer
             </Button>
-            <InputGroup className="m-2 w-25">
-              <Form.Control type="text" placeholder="Enter to Search" />
-              <InputGroup.Append>
-                <Button className="btn-outline">
-                  Search <i className="fa fa-search"></i>
-                </Button>
-              </InputGroup.Append>
-            </InputGroup>
+            <SearchBox value={searchQuery} onChange={this.handleSearch} />
           </Row>
           <Row>
-            <Table>
+            <Table size="sm" hover className="clickable">
               <TableHeader
                 onSort={this.handleSort}
                 columns={this.columns}
@@ -92,6 +108,7 @@ class Customers extends Component {
             />
           </Row>
         </Col>
+        <Col xl="1"></Col>
       </React.Fragment>
     );
   }

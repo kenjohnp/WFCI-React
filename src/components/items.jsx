@@ -1,15 +1,17 @@
 import React, { Component } from "react";
 import _ from "lodash";
-import { Col, Row, Table, Button, InputGroup, Form } from "react-bootstrap";
+import { Col, Row, Table, Button } from "react-bootstrap";
 import { getItems } from "../services/fakeItemService";
 import { paginate } from "../utils/paginate";
 import PaginationBar from "./common/paginationBar";
 import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
+import SearchBox from "./common/searchBox";
 
 class Items extends Component {
   state = {
     items: [],
+    searchQuery: "",
     currentPage: 1,
     pageSize: 8,
     sortColumn: { path: "title", order: "asc" }
@@ -20,7 +22,10 @@ class Items extends Component {
     {
       key: "delete",
       content: item => (
-        <Button className="btn-danger" onClick={() => this.handleDelete(item)}>
+        <Button
+          className="btn-danger btn-sm"
+          onClick={() => this.handleDelete(item)}
+        >
           Delete
         </Button>
       )
@@ -32,6 +37,14 @@ class Items extends Component {
     this.setState({ items });
   }
 
+  handleSearch = query => {
+    this.setState({ searchQuery: query, currentPage: 1 });
+  };
+
+  handleSort = sortColumn => {
+    this.setState({ sortColumn });
+  };
+
   handleDelete = item => {
     console.log(item);
   };
@@ -40,14 +53,22 @@ class Items extends Component {
     this.setState({ currentPage: page });
   };
 
-  handleSort = sortColumn => {
-    this.setState({ sortColumn });
-  };
-
   getPagedData() {
-    const { pageSize, currentPage, items: allItems, sortColumn } = this.state;
+    const {
+      pageSize,
+      currentPage,
+      items: allItems,
+      sortColumn,
+      searchQuery
+    } = this.state;
 
-    const sorted = _.orderBy(allItems, [sortColumn.path], [sortColumn.order]);
+    let filtered = allItems;
+    if (searchQuery)
+      filtered = allItems.filter(i =>
+        i.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      );
+
+    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
 
     const items = paginate(sorted, currentPage, pageSize);
 
@@ -55,31 +76,24 @@ class Items extends Component {
   }
 
   render() {
-    const { currentPage, pageSize, sortColumn } = this.state;
+    const { currentPage, pageSize, sortColumn, searchQuery } = this.state;
     const { totalCount, data: items } = this.getPagedData();
 
     return (
       <React.Fragment>
-        <Col md="2"></Col>
-        <Col className="p-5 w-75" md="8">
+        <Col xl="2"></Col>
+        <Col className="p-5 w-75" xl="8" md="12">
           <h2>
-            Items <span className="d-inline h-5">({totalCount} items)</span>
+            Items <span className="d-inline h-5"></span>
           </h2>
           <Row className="justify-content-between">
             <Button className="m-2 btn-primary">
               <i className="fa fa-plus-square"></i> New Item
             </Button>
-            <InputGroup className="m-2 w-25">
-              <Form.Control type="text" placeholder="Enter to Search" />
-              <InputGroup.Append>
-                <Button className="btn-outline">
-                  Search <i className="fa fa-search"></i>
-                </Button>
-              </InputGroup.Append>
-            </InputGroup>
+            <SearchBox value={searchQuery} onChange={this.handleSearch} />
           </Row>
           <Row>
-            <Table>
+            <Table size="sm">
               <TableHeader
                 columns={this.columns}
                 sortColumn={sortColumn}
@@ -95,6 +109,7 @@ class Items extends Component {
             />
           </Row>
         </Col>
+        <Col xl="2"></Col>
       </React.Fragment>
     );
   }
