@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { Component } from "react";
 import _ from "lodash";
 import { Col, Row, Table, Button } from "react-bootstrap";
@@ -18,7 +20,7 @@ class Items extends Component {
   };
 
   columns = [
-    { path: "name", label: "Item Name" },
+    { path: "name", label: "Item Name", class: "clickable" },
     {
       key: "delete",
       content: item => (
@@ -83,9 +85,7 @@ class Items extends Component {
       <React.Fragment>
         <Col xl="2"></Col>
         <Col className="p-5 w-75" xl="8" md="12">
-          <h2>
-            Items <span className="d-inline h-5"></span>
-          </h2>
+          <h2>Items</h2>
           <Row className="justify-content-between">
             <Button className="m-2 btn-primary">
               <i className="fa fa-plus-square"></i> New Item

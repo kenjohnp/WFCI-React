@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { Component } from "react";
 
 class TableHeader extends Component {
@@ -29,7 +31,7 @@ class TableHeader extends Component {
             <th
               key={column.path || column.key}
               onClick={() => this.raiseSort(column.path)}
-              className="clickable"
+              className={column.class}
             >
               {column.label} {this.renderSortIcon(column)}
             </th>

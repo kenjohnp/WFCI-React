@@ -1,3 +1,5 @@
+/** @format */
+
 import React from "react";
 import { InputGroup, Form, Button } from "react-bootstrap";
 
@@ -10,11 +12,6 @@ const SearchBox = ({ value, onChange }) => {
         value={value}
         onChange={e => onChange(e.currentTarget.value)}
       />
-      <InputGroup.Append>
-        <Button className="btn-outline">
-          Search <i className="fa fa-search"></i>
-        </Button>
-      </InputGroup.Append>
     </InputGroup>
   );
 };

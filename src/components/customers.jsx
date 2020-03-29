@@ -1,3 +1,5 @@
+/** @format */
+
 import React, { Component } from "react";
 import { Col, Row, Table, Button } from "react-bootstrap";
 import { getCustomers } from "../services/fakeCustomerService";
