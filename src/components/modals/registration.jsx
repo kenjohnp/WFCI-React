@@ -39,7 +39,7 @@ class Registration extends FormHelper {
     return (
       <React.Fragment>
         <Modal.Body>
-          <Form onSubmit={this.handleSubmit}>
+          <Form>
             {this.renderInput("username", "Username")}
             {this.renderInput("password", "Password", "password")}
             {this.renderCheck("isAdmin", "Make this user as Admin")}

@@ -3,12 +3,16 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import { Col, Row, Table, Button } from "react-bootstrap";
-import { getItems } from "../services/fakeItemService";
+import { getItems, deleteItem } from "../services/itemService";
 import { paginate } from "../utils/paginate";
+import { toast } from "react-toastify";
 import PaginationBar from "./common/paginationBar";
 import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
 import SearchBox from "./common/searchBox";
+import ModalForm from "./common/modalForm";
+import Item from "./modals/item";
+import Delete from "./modals/delete";
 
 class Items extends Component {
   state = {
@@ -16,7 +20,9 @@ class Items extends Component {
     searchQuery: "",
     currentPage: 1,
     pageSize: 8,
-    sortColumn: { path: "title", order: "asc" }
+    sortColumn: { path: "title", order: "asc" },
+    selectedId: "",
+    modal: { show: false, type: "" }
   };
 
   columns = [
@@ -26,7 +32,7 @@ class Items extends Component {
       content: item => (
         <Button
           className="btn-danger btn-sm"
-          onClick={() => this.handleDelete(item)}
+          onClick={() => this.handleModalShow("delete", item._id)}
         >
           Delete
         </Button>
@@ -35,8 +41,12 @@ class Items extends Component {
   ];
 
   async componentDidMount() {
-    const items = await getItems();
-    this.setState({ items });
+    this.loadItems();
+  }
+
+  async loadItems() {
+    const { data } = await getItems();
+    this.setState({ items: data });
   }
 
   handleSearch = query => {
@@ -47,8 +57,39 @@ class Items extends Component {
     this.setState({ sortColumn });
   };
 
-  handleDelete = item => {
-    console.log(item);
+  handleModalShow = (modalType, id = "") => {
+    let modal = this.state.modal;
+    modal = { show: true, type: modalType };
+    const selectedId = id;
+    this.setState({ modal, selectedId });
+  };
+
+  handleModalClose = () => {
+    let modal = this.state.modal;
+    modal.show = false;
+    this.setState({ modal });
+  };
+
+  handleSave = () => {
+    this.loadItems();
+  };
+
+  handleDelete = async () => {
+    const { selectedId } = this.state;
+    const originalItems = this.state.items;
+    const items = originalItems.filter(u => u._id !== selectedId);
+    this.setState({ items });
+    this.handleModalClose();
+
+    try {
+      await deleteItem(selectedId);
+      toast.error("Succesfully deleted.");
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        toast.error("This item has already been deleted.");
+
+      this.setState({ items: originalItems });
+    }
   };
 
   handlePageChange = page => {
@@ -78,8 +119,26 @@ class Items extends Component {
   }
 
   render() {
-    const { currentPage, pageSize, sortColumn, searchQuery } = this.state;
+    const {
+      currentPage,
+      pageSize,
+      sortColumn,
+      searchQuery,
+      modal
+    } = this.state;
     const { totalCount, data: items } = this.getPagedData();
+
+    const modalProps = {};
+    switch (this.state.modal.type) {
+      case "delete":
+        modalProps.title = "Delete Item";
+        modalProps.onSubmit = this.handleDelete;
+        break;
+      case "newItem":
+        modalProps.title = "New Item";
+        modalProps.onSubmit = this.handleSave;
+        break;
+    }
 
     return (
       <React.Fragment>
@@ -87,10 +146,19 @@ class Items extends Component {
         <Col className="p-5 w-75" xl="8" md="12">
           <h2>Items</h2>
           <Row className="justify-content-between">
-            <Button className="m-2 btn-primary">
+            <Button
+              className="m-2 btn-primary"
+              onClick={() => this.handleModalShow("newItem")}
+            >
               <i className="fa fa-plus-square"></i> New Item
             </Button>
             <SearchBox value={searchQuery} onChange={this.handleSearch} />
+            <ModalForm
+              show={modal.show}
+              onHide={this.handleModalClose}
+              component={this.state.modal.type === "delete" ? Delete : Item}
+              {...modalProps}
+            />
           </Row>
           <Row>
             <Table size="sm">

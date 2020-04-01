@@ -112,7 +112,7 @@ class Users extends Component {
       toast.error("Succesfully deleted.");
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
-        toast.error("This movie has already been deleted.");
+        toast.error("This user has already been deleted.");
 
       this.setState({ users: originalUsers });
     }

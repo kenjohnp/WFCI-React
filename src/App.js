@@ -10,13 +10,12 @@ import Login from "./components/login";
 import Items from "./components/items";
 import Customers from "./components/customers";
 import Users from "./components/users";
-import Register from "./components/register";
 import Logout from "./components/logout";
 import NotFound from "./components/notFound";
+import ProtectedRoute from "./components/common/protectedRoute";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import ProtectedRoute from "./components/common/protectedRoute";
 
 class App extends Component {
   state = {};
@@ -39,7 +38,6 @@ class App extends Component {
               <ProtectedRoute path="/customers" component={Customers} />
               <ProtectedRoute path="/items" component={Items} />
               <ProtectedRoute path="/users" component={Users} />
-              <ProtectedRoute path="/register" component={Register} />
               <ProtectedRoute path="/" exact component={Customers} />
               <Redirect to="/not-found" component={NotFound} />
             </Switch>
