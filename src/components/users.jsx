@@ -2,14 +2,16 @@
 
 import React, { Component } from "react";
 import _ from "lodash";
-import { Col, Row, Table, Badge, Button, InputGroup } from "react-bootstrap";
+import { Col, Row, Table, Badge, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
 import PaginationBar from "./common/paginationBar";
 import SearchBox from "./common/searchBox";
-import UsersModal from "./usersModal";
+import ModalForm from "./common/modalForm";
 import { paginate } from "../utils/paginate";
-import { getUsers } from "../services/fakeUsers";
+import { getUsers, deleteUser } from "../services/userService";
 class Users extends Component {
   state = {
     users: [],
@@ -17,7 +19,8 @@ class Users extends Component {
     currentPage: 1,
     sortColumn: { path: "username", order: "asc" },
     searchQuery: "",
-    show: false
+    show: false,
+    selectedId: ""
   };
 
   columns = [
@@ -32,18 +35,22 @@ class Users extends Component {
       class: "clickable w-15",
       content: item =>
         item.isAdmin ? (
-          <Badge variant="success">Admin</Badge>
+          <Badge pill variant="success p-2 clickable">
+            Admin
+          </Badge>
         ) : (
-          <Badge variant="info">User</Badge>
+          <Badge pill variant="info p-2">
+            User
+          </Badge>
         )
     },
     {
       key: "changePass",
       class: "w-15",
-      content: item => (
+      content: user => (
         <Button
           className="btn-info btn-sm"
-          onClick={() => this.handleChangePassword(item)}
+          onClick={() => this.handleChangePassword(user._id)}
         >
           Reset Password
         </Button>
@@ -52,10 +59,10 @@ class Users extends Component {
     {
       key: "delete",
       class: "w-15",
-      content: item => (
+      content: user => (
         <Button
           className="btn-danger btn-sm"
-          onClick={() => this.handleDelete(item)}
+          onClick={() => this.setState({ show: true, selectedId: user._id })}
         >
           Delete
         </Button>
@@ -63,9 +70,13 @@ class Users extends Component {
     }
   ];
 
-  componentDidMount() {
-    const users = getUsers();
-    this.setState({ users });
+  async componentDidMount() {
+    this.loadUsers();
+  }
+
+  async loadUsers() {
+    const { data } = await getUsers();
+    this.setState({ users: data });
   }
 
   handlePageChange = page => {
@@ -80,8 +91,24 @@ class Users extends Component {
     this.setState({ searchQuery: query, currentPage: 1 });
   };
 
-  handleModalShow = () => {
-    this.setState({ show: true });
+  handleSubmit = () => {
+    this.loadUsers();
+  };
+
+  handleDelete = async () => {
+    const { errors, selectedId } = this.state;
+    const originalUsers = this.state.users;
+    const users = originalUsers.filter(u => u._id !== selectedId);
+    this.setState({ users });
+    this.setState({ show: false });
+    try {
+      await deleteUser(selectedId);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        toast.error("This movie has already been deleted.");
+
+      this.setState({ users: originalUsers });
+    }
   };
 
   handleModalClose = () => {
@@ -122,11 +149,18 @@ class Users extends Component {
         <Col xl="8" md="12" className="p-5 w-75">
           <h2>Users</h2>
           <Row className="justify-content-between">
-            <Button className="m-2 btn-primary" onClick={this.handleModalShow}>
-              <i className="fa fa-plus-square"></i> New User
-            </Button>
+            <Link to="/register">
+              <Button className="m-2 btn-primary">
+                <i className="fa fa-plus-square"></i> New User
+              </Button>
+            </Link>
+            <ModalForm
+              show={this.state.show}
+              title="Delete User"
+              onDelete={this.handleDelete}
+              onHide={this.handleModalClose}
+            />
             <SearchBox value={searchQuery} onChange={this.handleSearch} />
-            <UsersModal show={this.state.show} onHide={this.handleModalClose} />
           </Row>
           <Row>
             <Table size="sm">

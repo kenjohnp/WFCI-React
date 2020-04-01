@@ -1,7 +1,7 @@
 /** @format */
 
 import React from "react";
-import { InputGroup, Form, Button } from "react-bootstrap";
+import { InputGroup, Form } from "react-bootstrap";
 
 const SearchBox = ({ value, onChange }) => {
   return (

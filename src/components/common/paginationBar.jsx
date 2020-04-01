@@ -1,3 +1,5 @@
+/** @format */
+
 import React from "react";
 import _ from "lodash";
 import { Pagination } from "react-bootstrap";
