@@ -3,13 +3,14 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import { Col, Row, Table, Badge, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
 import PaginationBar from "./common/paginationBar";
 import SearchBox from "./common/searchBox";
 import ModalForm from "./common/modalForm";
+import Delete from "./modals/delete";
+import Registration from "./modals/registration";
 import { paginate } from "../utils/paginate";
 import { getUsers, deleteUser } from "../services/userService";
 class Users extends Component {
@@ -19,7 +20,7 @@ class Users extends Component {
     currentPage: 1,
     sortColumn: { path: "username", order: "asc" },
     searchQuery: "",
-    show: false,
+    modal: { show: false, type: "" },
     selectedId: ""
   };
 
@@ -62,7 +63,7 @@ class Users extends Component {
       content: user => (
         <Button
           className="btn-danger btn-sm"
-          onClick={() => this.setState({ show: true, selectedId: user._id })}
+          onClick={() => this.handleModalShow("delete", user._id)}
         >
           Delete
         </Button>
@@ -95,14 +96,20 @@ class Users extends Component {
     this.loadUsers();
   };
 
+  handleSave = () => {
+    this.loadUsers();
+  };
+
   handleDelete = async () => {
-    const { errors, selectedId } = this.state;
+    const { selectedId } = this.state;
     const originalUsers = this.state.users;
     const users = originalUsers.filter(u => u._id !== selectedId);
     this.setState({ users });
-    this.setState({ show: false });
+    this.handleModalClose();
+
     try {
       await deleteUser(selectedId);
+      toast.error("Succesfully deleted.");
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
         toast.error("This movie has already been deleted.");
@@ -111,8 +118,17 @@ class Users extends Component {
     }
   };
 
+  handleModalShow = (modalType, id = "") => {
+    let modal = this.state.modal;
+    modal = { show: true, type: modalType };
+    const selectedId = id;
+    this.setState({ modal, selectedId });
+  };
+
   handleModalClose = () => {
-    this.setState({ show: false });
+    let modal = this.state.modal;
+    modal.show = false;
+    this.setState({ modal });
   };
 
   getPagedData() {
@@ -143,22 +159,37 @@ class Users extends Component {
 
     const { totalCount, data: users } = this.getPagedData();
 
+    const modalProps = {};
+    switch (this.state.modal.type) {
+      case "delete":
+        modalProps.title = "Delete User";
+        modalProps.onSubmit = this.handleDelete;
+        break;
+      case "newUser":
+        modalProps.title = "New User";
+        modalProps.onSubmit = this.handleSave;
+        break;
+    }
+
     return (
       <React.Fragment>
         <Col xl="2"></Col>
         <Col xl="8" md="12" className="p-5 w-75">
           <h2>Users</h2>
           <Row className="justify-content-between">
-            <Link to="/register">
-              <Button className="m-2 btn-primary">
-                <i className="fa fa-plus-square"></i> New User
-              </Button>
-            </Link>
+            <Button
+              className="m-2 btn-primary"
+              onClick={() => this.handleModalShow("newUser")}
+            >
+              <i className="fa fa-plus-square"></i> New User
+            </Button>
             <ModalForm
-              show={this.state.show}
-              title="Delete User"
-              onDelete={this.handleDelete}
+              show={this.state.modal.show}
               onHide={this.handleModalClose}
+              component={
+                this.state.modal.type === "delete" ? Delete : Registration
+              }
+              {...modalProps}
             />
             <SearchBox value={searchQuery} onChange={this.handleSearch} />
           </Row>
