@@ -7,11 +7,6 @@ import Input from "./input";
 import CheckBox from "./checkBox";
 
 class FormHelper extends Component {
-  state = {
-    data: {},
-    errors: {}
-  };
-
   validate = () => {
     const options = { abortEarly: false };
     const { error } = Joi.validate(this.state.data, this.schema, options);

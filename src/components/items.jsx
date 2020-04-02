@@ -21,7 +21,7 @@ class Items extends Component {
     currentPage: 1,
     pageSize: 8,
     sortColumn: { path: "title", order: "asc" },
-    selectedId: "",
+    selectedData: {},
     modal: { show: false, type: "" }
   };
 
@@ -30,12 +30,20 @@ class Items extends Component {
     {
       key: "delete",
       content: item => (
-        <Button
-          className="btn-danger btn-sm"
-          onClick={() => this.handleModalShow("delete", item._id)}
-        >
-          Delete
-        </Button>
+        <React.Fragment>
+          <Button
+            className="btn-info btn-sm mr-1"
+            onClick={() => this.handleModalShow("editItem", item)}
+          >
+            Edit
+          </Button>
+          <Button
+            className="btn-danger btn-sm"
+            onClick={() => this.handleModalShow("deleteItem", item)}
+          >
+            Delete
+          </Button>
+        </React.Fragment>
       )
     }
   ];
@@ -57,11 +65,10 @@ class Items extends Component {
     this.setState({ sortColumn });
   };
 
-  handleModalShow = (modalType, id = "") => {
+  handleModalShow = (modalType, selectedData = {}) => {
     let modal = this.state.modal;
     modal = { show: true, type: modalType };
-    const selectedId = id;
-    this.setState({ modal, selectedId });
+    this.setState({ modal, selectedData });
   };
 
   handleModalClose = () => {
@@ -72,24 +79,6 @@ class Items extends Component {
 
   handleSave = () => {
     this.loadItems();
-  };
-
-  handleDelete = async () => {
-    const { selectedId } = this.state;
-    const originalItems = this.state.items;
-    const items = originalItems.filter(u => u._id !== selectedId);
-    this.setState({ items });
-    this.handleModalClose();
-
-    try {
-      await deleteItem(selectedId);
-      toast.error("Succesfully deleted.");
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        toast.error("This item has already been deleted.");
-
-      this.setState({ items: originalItems });
-    }
   };
 
   handlePageChange = page => {
@@ -124,20 +113,21 @@ class Items extends Component {
       pageSize,
       sortColumn,
       searchQuery,
-      modal
+      modal,
+      selectedData
     } = this.state;
     const { totalCount, data: items } = this.getPagedData();
 
     const modalProps = {};
     switch (this.state.modal.type) {
-      case "delete":
+      case "deleteItem":
         modalProps.title = "Delete Item";
-        modalProps.onSubmit = this.handleDelete;
         break;
       case "newItem":
         modalProps.title = "New Item";
-        modalProps.onSubmit = this.handleSave;
         break;
+      case "editItem":
+        modalProps.title = "Edit Item";
     }
 
     return (
@@ -153,10 +143,13 @@ class Items extends Component {
               <i className="fa fa-plus-square"></i> New Item
             </Button>
             <SearchBox value={searchQuery} onChange={this.handleSearch} />
-            <ModalForm
+            <Item
               show={modal.show}
               onHide={this.handleModalClose}
-              component={this.state.modal.type === "delete" ? Delete : Item}
+              modalType={modal.type}
+              items={items}
+              selectedData={selectedData}
+              onSubmit={this.handleSave}
               {...modalProps}
             />
           </Row>

@@ -2,13 +2,14 @@
 
 import React from "react";
 import { Modal } from "react-bootstrap";
-const ModalForm = ({ show, title, onSubmit, onHide, component: Component }) => {
+const ModalForm = ({ show, title, component: Component, onHide, ...rest }) => {
+  console.log(Component);
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <Component onSubmit={onSubmit} onHide={onHide} />
+      <Component onHide={onHide} {...rest} />
     </Modal>
   );
 };

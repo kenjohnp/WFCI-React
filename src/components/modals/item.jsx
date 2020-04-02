@@ -1,7 +1,8 @@
 /** @format */
 
 import React from "react";
-import { saveItem } from "../../services/itemService";
+import _ from "lodash";
+import { saveItem, deleteItem } from "../../services/itemService";
 import { toast } from "react-toastify";
 import { Modal, Form } from "react-bootstrap";
 import FormHelper from "../common/formHelper";
@@ -16,12 +17,44 @@ class Item extends FormHelper {
       .label("Item Name")
   };
 
+  resetModal = () => {
+    const data = { name: "" };
+    const errors = {};
+    this.setState({ data, errors });
+  };
+
+  handleEntered = () => {
+    if (!_.isEmpty(this.props.selectedData)) {
+      const data = this.props.selectedData;
+      this.setState({ data });
+    }
+  };
+
   handleSave = async () => {
+    const { modalType, onHide, onSubmit, selectedData } = this.props;
     try {
-      await saveItem(this.state.data);
-      this.props.onHide();
-      this.props.onSubmit();
-      toast.success("Item added successfully.");
+      if (!_.isEmpty(selectedData)) {
+        const data = this.state.data;
+        data._id = selectedData._id;
+        this.setState({ data });
+      }
+
+      switch (modalType) {
+        case "newItem":
+          await saveItem(this.state.data);
+          toast.success("Item added successfully");
+          break;
+        case "editItem":
+          toast.success("Item edited successfully.");
+          await saveItem(this.state.data);
+          break;
+        case "deleteItem":
+          toast.error("Item deleted successfully.");
+          await deleteItem(this.props.selectedData._id);
+      }
+      this.resetModal();
+      onHide();
+      onSubmit();
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         toast.error(ex.response.data);
@@ -30,15 +63,33 @@ class Item extends FormHelper {
   };
 
   render() {
+    const { title, show, onHide, modalType } = this.props;
+
     return (
       <React.Fragment>
-        <Modal.Body>
-          <Form>{this.renderInput("name", "Item Name")}</Form>
-        </Modal.Body>
-        <Modal.Footer>
-          {this.renderModalButton("Save", this.handleSave, "primary", true)}
-          {this.renderModalButton("Close", this.props.onHide, "secondary")}
-        </Modal.Footer>
+        <Modal show={show} onHide={onHide} onEntered={this.handleEntered}>
+          <Modal.Header closeButton>
+            <Modal.Title>{title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {modalType !== "deleteItem" ? (
+              <Form>{this.renderInput("name", "Item Name")}</Form>
+            ) : (
+              this.renderModalButton("Delete", this.handleSave, "danger")
+            )}
+          </Modal.Body>
+          {modalType !== "deleteItem" && (
+            <Modal.Footer>
+              {this.renderModalButton(
+                "Save",
+                this.handleSave,
+                "primary",
+                false
+              )}
+              {this.renderModalButton("Close", onHide, "secondary")}
+            </Modal.Footer>
+          )}
+        </Modal>
       </React.Fragment>
     );
   }
