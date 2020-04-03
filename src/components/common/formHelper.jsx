@@ -63,12 +63,19 @@ class FormHelper extends Component {
     );
   }
 
-  renderModalButton(label, onClick, variant, validation = false) {
+  renderModalButton(
+    label,
+    onClick,
+    variant,
+    validation = false,
+    className = ""
+  ) {
     return (
       <Button
         disabled={this.validate() && validation}
         variant={variant}
         onClick={onClick}
+        className={className}
       >
         {label}
       </Button>

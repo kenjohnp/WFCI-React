@@ -3,9 +3,10 @@
 import React, { Component } from "react";
 import { Form, Modal } from "react-bootstrap";
 import Joi from "joi-browser";
+import _ from "lodash";
 import { toast } from "react-toastify";
 import FormHelper from "../common/formHelper";
-import { saveUser } from "../../services/userService";
+import { saveUser, deleteUser } from "../../services/userService";
 
 class Registration extends FormHelper {
   state = { data: { username: "", password: "", isAdmin: false }, errors: {} };
@@ -22,12 +23,60 @@ class Registration extends FormHelper {
     isAdmin: Joi.boolean()
   };
 
-  handleSave = async () => {
+  resetModal = () => {
+    const data = { username: "", password: "", isAdmin: false };
+    const errors = {};
+    this.setState({ data, errors });
+  };
+
+  handleEntered = () => {
+    const { selectedData, modalType } = this.props;
+    if (!_.isEmpty(selectedData)) {
+      const data = { ...selectedData, password: "" };
+      this.setState({ data });
+    }
+
+    if (modalType === "resetPassword") {
+      delete this.schema.username;
+    } else if (modalType === "newUser") {
+      this.schema.username = Joi.string()
+        .min(5)
+        .required()
+        .label("Username");
+    }
+  };
+
+  handleSave = async e => {
+    e.preventDefault();
+    const { modalType, selectedData, onHide, onSubmit } = this.props;
+
     try {
-      await saveUser(this.state.data);
-      this.props.onHide();
-      this.props.onSubmit();
-      toast.success("User added successfully.");
+      if (!_.isEmpty(selectedData)) {
+        const data = this.state.data;
+        data._id = selectedData._id;
+        this.setState({ data });
+      }
+
+      switch (modalType) {
+        case "newUser":
+          await saveUser(this.state.data);
+          toast.success("User registered successfully.");
+          break;
+        case "resetPassword":
+          await saveUser(this.state.data);
+          toast.success("Password resetted successfully.");
+          break;
+        case "deleteUser":
+          await deleteUser(selectedData._id);
+          toast.error("User deleted successfully.");
+          break;
+        default:
+          break;
+      }
+
+      this.resetModal();
+      onHide();
+      onSubmit();
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         toast.error(ex.response.data);
@@ -36,19 +85,45 @@ class Registration extends FormHelper {
   };
 
   render() {
+    const { show, onHide, title, modalType } = this.props;
+
     return (
       <React.Fragment>
-        <Modal.Body>
-          <Form>
-            {this.renderInput("username", "Username")}
-            {this.renderInput("password", "Password", "password")}
-            {this.renderCheck("isAdmin", "Make this user as Admin")}
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          {this.renderModalButton("Save", this.handleSave, "primary", true)}
-          {this.renderModalButton("Close", this.props.onHide, "secondary")}
-        </Modal.Footer>
+        <Modal show={show} onHide={onHide} onEntered={this.handleEntered}>
+          <Modal.Header closeButton>
+            <Modal.Title>{title}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {modalType !== "deleteUser" ? (
+              <Form onSubmit={this.handleSave}>
+                {modalType !== "resetPassword" &&
+                  this.renderInput("username", "Username")}
+                {this.renderInput("password", "Password", "password")}
+                {modalType !== "resetPassword" &&
+                  this.renderCheck("isAdmin", "Make this user as Admin")}
+              </Form>
+            ) : (
+              this.renderModalButton(
+                "Delete",
+                this.handleSave,
+                "danger",
+                false,
+                "btn-block"
+              )
+            )}
+          </Modal.Body>
+          {modalType !== "deleteUser" && (
+            <Modal.Footer>
+              {this.renderModalButton(
+                "Save",
+                this.handleSave,
+                "primary",
+                false
+              )}
+              {this.renderModalButton("Close", onHide, "secondary")}
+            </Modal.Footer>
+          )}
+        </Modal>
       </React.Fragment>
     );
   }

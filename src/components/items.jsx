@@ -3,16 +3,13 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import { Col, Row, Table, Button } from "react-bootstrap";
-import { getItems, deleteItem } from "../services/itemService";
+import { getItems } from "../services/itemService";
 import { paginate } from "../utils/paginate";
-import { toast } from "react-toastify";
 import PaginationBar from "./common/paginationBar";
 import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
 import SearchBox from "./common/searchBox";
-import ModalForm from "./common/modalForm";
 import Item from "./modals/item";
-import Delete from "./modals/delete";
 
 class Items extends Component {
   state = {
@@ -128,6 +125,10 @@ class Items extends Component {
         break;
       case "editItem":
         modalProps.title = "Edit Item";
+        break;
+      default:
+        modalProps.title = "Undefined";
+        break;
     }
 
     return (

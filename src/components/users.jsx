@@ -8,8 +8,6 @@ import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
 import PaginationBar from "./common/paginationBar";
 import SearchBox from "./common/searchBox";
-import ModalForm from "./common/modalForm";
-import Delete from "./modals/delete";
 import Registration from "./modals/registration";
 import { paginate } from "../utils/paginate";
 import { getUsers, deleteUser } from "../services/userService";
@@ -21,7 +19,7 @@ class Users extends Component {
     sortColumn: { path: "username", order: "asc" },
     searchQuery: "",
     modal: { show: false, type: "" },
-    selectedId: ""
+    selectedData: {}
   };
 
   columns = [
@@ -46,12 +44,12 @@ class Users extends Component {
         )
     },
     {
-      key: "changePass",
+      key: "resetPass",
       class: "w-15",
       content: user => (
         <Button
           className="btn-info btn-sm"
-          onClick={() => this.handleChangePassword(user._id)}
+          onClick={() => this.handleModalShow("resetPassword", user)}
         >
           Reset Password
         </Button>
@@ -63,7 +61,7 @@ class Users extends Component {
       content: user => (
         <Button
           className="btn-danger btn-sm"
-          onClick={() => this.handleModalShow("delete", user._id)}
+          onClick={() => this.handleModalShow("deleteUser", user)}
         >
           Delete
         </Button>
@@ -100,29 +98,10 @@ class Users extends Component {
     this.loadUsers();
   };
 
-  handleDelete = async () => {
-    const { selectedId } = this.state;
-    const originalUsers = this.state.users;
-    const users = originalUsers.filter(u => u._id !== selectedId);
-    this.setState({ users });
-    this.handleModalClose();
-
-    try {
-      await deleteUser(selectedId);
-      toast.error("Succesfully deleted.");
-    } catch (ex) {
-      if (ex.response && ex.response.status === 404)
-        toast.error("This user has already been deleted.");
-
-      this.setState({ users: originalUsers });
-    }
-  };
-
-  handleModalShow = (modalType, id = "") => {
+  handleModalShow = (modalType, selectedData = {}) => {
     let modal = this.state.modal;
     modal = { show: true, type: modalType };
-    const selectedId = id;
-    this.setState({ modal, selectedId });
+    this.setState({ modal, selectedData });
   };
 
   handleModalClose = () => {
@@ -155,19 +134,27 @@ class Users extends Component {
   }
 
   render() {
-    const { sortColumn, searchQuery, currentPage, pageSize } = this.state;
+    const {
+      sortColumn,
+      searchQuery,
+      currentPage,
+      pageSize,
+      modal,
+      selectedData
+    } = this.state;
 
     const { totalCount, data: users } = this.getPagedData();
 
     const modalProps = {};
     switch (this.state.modal.type) {
-      case "delete":
+      case "deleteUser":
         modalProps.title = "Delete User";
-        modalProps.onSubmit = this.handleDelete;
         break;
       case "newUser":
         modalProps.title = "New User";
-        modalProps.onSubmit = this.handleSave;
+        break;
+      case "resetPassword":
+        modalProps.title = "Reset Password";
         break;
     }
 
@@ -183,12 +170,13 @@ class Users extends Component {
             >
               <i className="fa fa-plus-square"></i> New User
             </Button>
-            <ModalForm
-              show={this.state.modal.show}
+            <Registration
+              show={modal.show}
               onHide={this.handleModalClose}
-              component={
-                this.state.modal.type === "delete" ? Delete : Registration
-              }
+              modalType={modal.type}
+              users={users}
+              selectedData={selectedData}
+              onSubmit={this.handleSave}
               {...modalProps}
             />
             <SearchBox value={searchQuery} onChange={this.handleSearch} />
