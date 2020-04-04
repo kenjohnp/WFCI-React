@@ -2,7 +2,7 @@
 
 import React from "react";
 import _ from "lodash";
-import { saveItem, deleteItem } from "../../services/itemService";
+import { saveItem } from "../../services/itemService";
 import { toast } from "react-toastify";
 import { Modal, Form } from "react-bootstrap";
 import FormHelper from "../common/formHelper";

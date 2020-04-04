@@ -12,7 +12,6 @@ import Registration from "./modals/registration";
 import { paginate } from "../utils/paginate";
 import {
   getUsers,
-  saveUser,
   updateUserStatus,
   deleteUser,
 } from "../services/userService";
@@ -197,6 +196,8 @@ class Users extends Component {
       case "resetPassword":
         modalProps.title = "Reset Password";
         modalProps.onSubmit = this.handleSave;
+        break;
+      default:
         break;
     }
 

@@ -10,8 +10,6 @@ import TableHeader from "./common/tableHeader";
 import TableBody from "./common/tableBody";
 import PaginationBar from "./common/paginationBar";
 import SearchBox from "./common/searchBox";
-import ModalForm from "./common/modalForm";
-import Delete from "./modals/delete";
 import Customer from "./modals/customer";
 
 class Customers extends Component {
@@ -131,7 +129,6 @@ class Customers extends Component {
       currentPage,
       searchQuery,
       modal,
-      show,
       selectedData,
     } = this.state;
     const { totalCount, data: customers } = this.getPagedData();
@@ -149,6 +146,8 @@ class Customers extends Component {
       case "edit":
         modalProps.title = "Edit Customer";
         modalProps.onSubmit = this.handleSave;
+        break;
+      default:
         break;
     }
 

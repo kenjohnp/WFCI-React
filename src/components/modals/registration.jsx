@@ -1,12 +1,12 @@
 /** @format */
 
-import React, { Component } from "react";
+import React from "react";
 import { Form, Modal } from "react-bootstrap";
 import Joi from "joi-browser";
 import _ from "lodash";
 import { toast } from "react-toastify";
 import FormHelper from "../common/formHelper";
-import { saveUser, deleteUser } from "../../services/userService";
+import { saveUser } from "../../services/userService";
 
 class Registration extends FormHelper {
   state = { data: { username: "", password: "", isAdmin: false }, errors: {} };
