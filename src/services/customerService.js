@@ -17,7 +17,8 @@ export function saveCustomer(customer) {
   if (customer._id) {
     const body = { ...customer };
     delete body._id;
-    http.put(getUrl(customer._id), body);
+    delete body.dateCreated;
+    return http.put(getUrl(customer._id), body);
   }
 
   return http.post(apiEndpoint, customer);

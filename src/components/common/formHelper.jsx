@@ -35,7 +35,7 @@ class FormHelper extends Component {
     this.setState({ data, errors });
   };
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     e.preventDefault();
 
     const errors = this.validate();
@@ -82,7 +82,7 @@ class FormHelper extends Component {
     );
   }
 
-  renderInput(name, label, type = "text") {
+  renderInput(name, label, type = "text", ref) {
     const { data, errors } = this.state;
 
     return (

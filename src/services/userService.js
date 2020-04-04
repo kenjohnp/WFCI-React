@@ -17,6 +17,11 @@ export function getUser(userId) {
   return http.get(getUrl(userId));
 }
 
+export function updateUserStatus(user) {
+  const body = { ...user };
+  return http.put(getUrl(`updateStatus/${body._id}`), body);
+}
+
 export function saveUser(user) {
   if (user._id) {
     const body = { ...user };

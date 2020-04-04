@@ -3,7 +3,8 @@
 import React, { Component } from "react";
 import _ from "lodash";
 import { Col, Row, Table, Button } from "react-bootstrap";
-import { getItems } from "../services/itemService";
+import { toast } from "react-toastify";
+import { getItems, deleteItem } from "../services/itemService";
 import { paginate } from "../utils/paginate";
 import PaginationBar from "./common/paginationBar";
 import TableHeader from "./common/tableHeader";
@@ -19,14 +20,14 @@ class Items extends Component {
     pageSize: 8,
     sortColumn: { path: "title", order: "asc" },
     selectedData: {},
-    modal: { show: false, type: "" }
+    modal: { show: false, type: "" },
   };
 
   columns = [
     { path: "name", label: "Item Name", class: "clickable" },
     {
       key: "delete",
-      content: item => (
+      content: (item) => (
         <React.Fragment>
           <Button
             className="btn-info btn-sm mr-1"
@@ -41,8 +42,8 @@ class Items extends Component {
             Delete
           </Button>
         </React.Fragment>
-      )
-    }
+      ),
+    },
   ];
 
   async componentDidMount() {
@@ -54,11 +55,11 @@ class Items extends Component {
     this.setState({ items: data });
   }
 
-  handleSearch = query => {
+  handleSearch = (query) => {
     this.setState({ searchQuery: query, currentPage: 1 });
   };
 
-  handleSort = sortColumn => {
+  handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
 
@@ -74,11 +75,26 @@ class Items extends Component {
     this.setState({ modal });
   };
 
-  handleSave = () => {
+  handleSave = (item) => {
     this.loadItems();
   };
 
-  handlePageChange = page => {
+  handleDelete = async (item) => {
+    const originalItems = [...this.state.items];
+    const items = originalItems.filter((i) => i._id !== item._id);
+    this.setState({ items });
+
+    try {
+      await deleteItem(item._id);
+      toast.success("Item deleted successfully.");
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400)
+        toast.error(ex.response.data);
+      this.setState({ items: originalItems });
+    }
+  };
+
+  handlePageChange = (page) => {
     this.setState({ currentPage: page });
   };
 
@@ -88,12 +104,12 @@ class Items extends Component {
       currentPage,
       items: allItems,
       sortColumn,
-      searchQuery
+      searchQuery,
     } = this.state;
 
     let filtered = allItems;
     if (searchQuery)
-      filtered = allItems.filter(i =>
+      filtered = allItems.filter((i) =>
         i.name.toLowerCase().startsWith(searchQuery.toLowerCase())
       );
 
@@ -111,7 +127,7 @@ class Items extends Component {
       sortColumn,
       searchQuery,
       modal,
-      selectedData
+      selectedData,
     } = this.state;
     const { totalCount, data: items } = this.getPagedData();
 
@@ -119,15 +135,19 @@ class Items extends Component {
     switch (this.state.modal.type) {
       case "deleteItem":
         modalProps.title = "Delete Item";
+        modalProps.onSubmit = this.handleDelete;
         break;
       case "newItem":
         modalProps.title = "New Item";
+        modalProps.onSubmit = this.handleSave;
         break;
       case "editItem":
         modalProps.title = "Edit Item";
+        modalProps.onSubmit = this.handleSave;
         break;
       default:
         modalProps.title = "Undefined";
+        modalProps.onSubmit = this.handleSave;
         break;
     }
 
@@ -150,7 +170,6 @@ class Items extends Component {
               modalType={modal.type}
               items={items}
               selectedData={selectedData}
-              onSubmit={this.handleSave}
               {...modalProps}
             />
           </Row>

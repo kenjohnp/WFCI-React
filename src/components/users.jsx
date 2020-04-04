@@ -10,7 +10,12 @@ import PaginationBar from "./common/paginationBar";
 import SearchBox from "./common/searchBox";
 import Registration from "./modals/registration";
 import { paginate } from "../utils/paginate";
-import { getUsers, deleteUser } from "../services/userService";
+import {
+  getUsers,
+  saveUser,
+  updateUserStatus,
+  deleteUser,
+} from "../services/userService";
 class Users extends Component {
   state = {
     users: [],
@@ -19,54 +24,62 @@ class Users extends Component {
     sortColumn: { path: "username", order: "asc" },
     searchQuery: "",
     modal: { show: false, type: "" },
-    selectedData: {}
+    selectedData: {},
   };
 
   columns = [
     {
       path: "username",
       label: "Username",
-      class: "clickable w-30"
+      class: "clickable w-30",
     },
     {
       path: "isAdmin",
       label: "Status",
       class: "clickable w-15",
-      content: item =>
-        item.isAdmin ? (
-          <Badge pill variant="success p-2 clickable">
+      content: (user) =>
+        user.isAdmin ? (
+          <Badge
+            pill
+            variant="success p-2 clickable"
+            onClick={() => this.handleToggleStatus(user)}
+          >
             Admin
           </Badge>
         ) : (
-          <Badge pill variant="info p-2">
+          <Badge
+            pill
+            variant="info p-2 clickable"
+            onClick={() => this.handleToggleStatus(user)}
+          >
             User
           </Badge>
-        )
+        ),
     },
     {
       key: "resetPass",
       class: "w-15",
-      content: user => (
+      content: (user) => (
         <Button
           className="btn-info btn-sm"
           onClick={() => this.handleModalShow("resetPassword", user)}
         >
           Reset Password
         </Button>
-      )
+      ),
     },
     {
       key: "delete",
       class: "w-15",
-      content: user => (
+      content: (user) => (
         <Button
           className="btn-danger btn-sm"
           onClick={() => this.handleModalShow("deleteUser", user)}
         >
           Delete
         </Button>
-      )
-    }
+      ),
+    },
   ];
 
   async componentDidMount() {
@@ -78,24 +91,50 @@ class Users extends Component {
     this.setState({ users: data });
   }
 
-  handlePageChange = page => {
+  handlePageChange = (page) => {
     this.setState({ currentPage: page });
   };
 
-  handleSort = sortColumn => {
+  handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
 
-  handleSearch = query => {
+  handleSearch = (query) => {
     this.setState({ searchQuery: query, currentPage: 1 });
   };
 
-  handleSubmit = () => {
+  handleSave = (selectedData) => {
     this.loadUsers();
   };
 
-  handleSave = () => {
-    this.loadUsers();
+  handleToggleStatus = async (user) => {
+    try {
+      const users = [...this.state.users];
+      const index = users.indexOf(user);
+      users[index] = { ...users[index] };
+      users[index].isAdmin = !users[index].isAdmin;
+      await updateUserStatus(users[index]);
+      toast.success("User updated.");
+      this.setState({ users });
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400)
+        toast.error(ex.response.data);
+    }
+  };
+
+  handleDelete = async (user) => {
+    const originalUsers = this.state.users;
+    const users = originalUsers.filter((u) => u._id !== user._id);
+    this.setState({ users });
+    toast.success("User deleted successfully.");
+    try {
+      await deleteUser(user._id);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400)
+        toast.error(ex.response.data);
+
+      this.setState({ users: originalUsers });
+    }
   };
 
   handleModalShow = (modalType, selectedData = {}) => {
@@ -116,13 +155,13 @@ class Users extends Component {
       currentPage,
       users: allUsers,
       sortColumn,
-      searchQuery
+      searchQuery,
     } = this.state;
 
     let filtered = allUsers;
 
     if (searchQuery)
-      filtered = allUsers.filter(u =>
+      filtered = allUsers.filter((u) =>
         u.username.toLowerCase().startsWith(searchQuery.toLowerCase())
       );
 
@@ -140,7 +179,7 @@ class Users extends Component {
       currentPage,
       pageSize,
       modal,
-      selectedData
+      selectedData,
     } = this.state;
 
     const { totalCount, data: users } = this.getPagedData();
@@ -149,12 +188,15 @@ class Users extends Component {
     switch (this.state.modal.type) {
       case "deleteUser":
         modalProps.title = "Delete User";
+        modalProps.onSubmit = this.handleDelete;
         break;
       case "newUser":
         modalProps.title = "New User";
+        modalProps.onSubmit = this.handleSave;
         break;
       case "resetPassword":
         modalProps.title = "Reset Password";
+        modalProps.onSubmit = this.handleSave;
         break;
     }
 
@@ -176,7 +218,6 @@ class Users extends Component {
               modalType={modal.type}
               users={users}
               selectedData={selectedData}
-              onSubmit={this.handleSave}
               {...modalProps}
             />
             <SearchBox value={searchQuery} onChange={this.handleSearch} />

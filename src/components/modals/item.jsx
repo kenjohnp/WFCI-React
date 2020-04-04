@@ -12,9 +12,7 @@ class Item extends FormHelper {
   state = { data: { name: "" }, errors: {} };
 
   schema = {
-    name: Joi.string()
-      .required()
-      .label("Item Name")
+    name: Joi.string().required().label("Item Name"),
   };
 
   resetModal = () => {
@@ -23,7 +21,8 @@ class Item extends FormHelper {
     this.setState({ data, errors });
   };
 
-  handleEntered = () => {
+  handleEntering = () => {
+    this.resetModal();
     const { selectedData } = this.props;
     if (!_.isEmpty(selectedData)) {
       const data = selectedData;
@@ -31,7 +30,7 @@ class Item extends FormHelper {
     }
   };
 
-  handleSave = async e => {
+  handleSave = async (e) => {
     e.preventDefault();
     const { modalType, onHide, onSubmit, selectedData } = this.props;
     try {
@@ -50,16 +49,12 @@ class Item extends FormHelper {
           toast.success("Item edited successfully.");
           await saveItem(this.state.data);
           break;
-        case "deleteItem":
-          toast.error("Item deleted successfully.");
-          await deleteItem(selectedData._id);
-          break;
         default:
           break;
       }
       this.resetModal();
       onHide();
-      onSubmit();
+      onSubmit(selectedData);
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         toast.error(ex.response.data);
@@ -75,8 +70,8 @@ class Item extends FormHelper {
         <Modal
           show={show}
           onHide={onHide}
-          onEntered={this.handleEntered}
-          enforceFocus={false}
+          onEntering={this.handleEntering}
+          enforceFocus
         >
           <Modal.Header closeButton>
             <Modal.Title>{title}</Modal.Title>
@@ -84,7 +79,7 @@ class Item extends FormHelper {
           <Modal.Body>
             {modalType !== "deleteItem" ? (
               <Form onSubmit={this.handleSave}>
-                {/* {this.renderInput("name", "Item Name")} */}
+                {this.renderInput("name", "Item Name")}
               </Form>
             ) : (
               this.renderModalButton(

@@ -22,7 +22,7 @@ class Customers extends Component {
     pageSize: 8,
     currentPage: 1,
     selectedData: "",
-    modal: { show: false, type: "" }
+    modal: { show: false, type: "" },
   };
 
   columns = [
@@ -30,15 +30,23 @@ class Customers extends Component {
     { path: "address", label: "Address" },
     {
       key: "delete",
-      content: customer => (
-        <Button
-          className="btn-danger btn-sm"
-          onClick={() => this.handleModalShow("delete", customer._id)}
-        >
-          Delete
-        </Button>
-      )
-    }
+      content: (customer) => (
+        <React.Fragment>
+          <Button
+            className="btn-info btn-sm m-1"
+            onClick={() => this.handleModalShow("edit", customer)}
+          >
+            Edit
+          </Button>
+          <Button
+            className="btn-danger btn-sm"
+            onClick={() => this.handleModalShow("delete", customer)}
+          >
+            Delete
+          </Button>
+        </React.Fragment>
+      ),
+    },
   ];
 
   componentDidMount() {
@@ -50,10 +58,10 @@ class Customers extends Component {
     this.setState({ customers: data });
   }
 
-  handleModalShow = (modalType, id = "") => {
+  handleModalShow = (modalType, selectedData = {}) => {
     let modal = this.state.modal;
     modal = { show: true, type: modalType };
-    this.setState({ modal, selectedData: id });
+    this.setState({ modal, selectedData });
   };
 
   handleModalClose = () => {
@@ -62,20 +70,18 @@ class Customers extends Component {
     this.setState({ modal });
   };
 
-  handleSave = () => {
+  handleSave = (data) => {
     this.loadCustomers();
   };
 
-  handleDelete = async () => {
-    const { selectedData } = this.state;
+  handleDelete = async (customer) => {
     const originalCustomers = this.state.customers;
-    const customers = originalCustomers.filter(u => u._id !== selectedData);
+    const customers = originalCustomers.filter((u) => u._id !== customer._id);
     this.setState({ customers });
-    this.handleModalClose();
 
     try {
-      await deleteCustomer(selectedData);
-      toast.error("Succesfully deleted.");
+      await deleteCustomer(customer._id);
+      toast.success("Succesfully deleted.");
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
         toast.error("This customer has already been deleted.");
@@ -84,15 +90,15 @@ class Customers extends Component {
     }
   };
 
-  handleSearch = query => {
+  handleSearch = (query) => {
     this.setState({ searchQuery: query, currentPage: 1 });
   };
 
-  handleSort = sortColumn => {
+  handleSort = (sortColumn) => {
     this.setState({ sortColumn });
   };
 
-  handlePageChange = page => {
+  handlePageChange = (page) => {
     this.setState({ currentPage: page });
   };
 
@@ -102,12 +108,12 @@ class Customers extends Component {
       currentPage,
       customers: allCustomers,
       sortColumn,
-      searchQuery
+      searchQuery,
     } = this.state;
 
     let filtered = allCustomers;
     if (searchQuery)
-      filtered = allCustomers.filter(c =>
+      filtered = allCustomers.filter((c) =>
         c.name.toLowerCase().startsWith(searchQuery.toLowerCase())
       );
 
@@ -124,7 +130,9 @@ class Customers extends Component {
       pageSize,
       currentPage,
       searchQuery,
-      modal
+      modal,
+      show,
+      selectedData,
     } = this.state;
     const { totalCount, data: customers } = this.getPagedData();
 
@@ -134,8 +142,12 @@ class Customers extends Component {
         modalProps.title = "Delete Item";
         modalProps.onSubmit = this.handleDelete;
         break;
-      case "newCustomer":
+      case "new":
         modalProps.title = "New Customer";
+        modalProps.onSubmit = this.handleSave;
+        break;
+      case "edit":
+        modalProps.title = "Edit Customer";
         modalProps.onSubmit = this.handleSave;
         break;
     }
@@ -148,15 +160,17 @@ class Customers extends Component {
           <Row className="justify-content-between">
             <Button
               className="m-2 btn-primary"
-              onClick={() => this.handleModalShow("newCustomer")}
+              onClick={() => this.handleModalShow("new")}
             >
               <i className="fa fa-plus-square"></i> New Customer
             </Button>
             <SearchBox value={searchQuery} onChange={this.handleSearch} />
-            <ModalForm
+            <Customer
               show={modal.show}
               onHide={this.handleModalClose}
-              component={modal.type === "delete" ? Delete : Customer}
+              modalType={modal.type}
+              customers={customers}
+              selectedData={selectedData}
               {...modalProps}
             />
           </Row>

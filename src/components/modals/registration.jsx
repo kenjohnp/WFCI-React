@@ -12,15 +12,9 @@ class Registration extends FormHelper {
   state = { data: { username: "", password: "", isAdmin: false }, errors: {} };
 
   schema = {
-    username: Joi.string()
-      .min(5)
-      .required()
-      .label("Username"),
-    password: Joi.string()
-      .min(5)
-      .required()
-      .label("Password"),
-    isAdmin: Joi.boolean()
+    username: Joi.string().min(5).required().label("Username"),
+    password: Joi.string().min(5).required().label("Password"),
+    isAdmin: Joi.boolean(),
   };
 
   resetModal = () => {
@@ -29,7 +23,8 @@ class Registration extends FormHelper {
     this.setState({ data, errors });
   };
 
-  handleEntered = () => {
+  handleEntering = () => {
+    this.resetModal();
     const { selectedData, modalType } = this.props;
     if (!_.isEmpty(selectedData)) {
       const data = { ...selectedData, password: "" };
@@ -39,14 +34,11 @@ class Registration extends FormHelper {
     if (modalType === "resetPassword") {
       delete this.schema.username;
     } else if (modalType === "newUser") {
-      this.schema.username = Joi.string()
-        .min(5)
-        .required()
-        .label("Username");
+      this.schema.username = Joi.string().min(5).required().label("Username");
     }
   };
 
-  handleSave = async e => {
+  handleSave = async (e) => {
     e.preventDefault();
     const { modalType, selectedData, onHide, onSubmit } = this.props;
 
@@ -56,7 +48,6 @@ class Registration extends FormHelper {
         data._id = selectedData._id;
         this.setState({ data });
       }
-
       switch (modalType) {
         case "newUser":
           await saveUser(this.state.data);
@@ -66,17 +57,13 @@ class Registration extends FormHelper {
           await saveUser(this.state.data);
           toast.success("Password resetted successfully.");
           break;
-        case "deleteUser":
-          await deleteUser(selectedData._id);
-          toast.error("User deleted successfully.");
-          break;
         default:
           break;
       }
 
       this.resetModal();
       onHide();
-      onSubmit();
+      onSubmit(selectedData);
     } catch (ex) {
       if (ex.response && ex.response.status === 400) {
         toast.error(ex.response.data);
@@ -89,7 +76,12 @@ class Registration extends FormHelper {
 
     return (
       <React.Fragment>
-        <Modal show={show} onHide={onHide} onEntered={this.handleEntered}>
+        <Modal
+          show={show}
+          onHide={onHide}
+          onEntering={this.handleEntering}
+          autoFocus={false}
+        >
           <Modal.Header closeButton>
             <Modal.Title>{title}</Modal.Title>
           </Modal.Header>
