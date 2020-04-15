@@ -25,3 +25,41 @@ code {
 .w-30 {
   width: 30%;
 }
+
+.w-600px {
+  width: 600px;
+}
+
+.react-datepicker-wrapper {
+  display: block;
+}
+
+.sidebar {
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  width: 250px;
+  height: 100vh;
+  left: 0;
+}
+
+.sidebar ul {
+  list-style: none;
+  margin-top: 30px;
+  padding-inline-start: 0;
+}
+
+.sidebar ul li {
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.sidebar ul li:hover {
+  background-color: #eee;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: #000;
+  padding: 10px 20px;
+  display: block;
+}

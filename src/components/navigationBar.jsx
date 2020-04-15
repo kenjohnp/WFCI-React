@@ -15,7 +15,7 @@ class NavigationBar extends Component {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="ml-5">
-                <NavLink className="nav-link" to="/salesorder">
+                <NavLink className="nav-link" to="/salesorders">
                   Sales Orders
                 </NavLink>
                 <NavLink className="nav-link" to="/deliveryreceipts">

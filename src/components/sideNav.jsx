@@ -1,18 +1,18 @@
 import React from "react";
-import { Nav, Col } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
 
 const SideNav = () => {
   return (
-    <Col md="2" className="bg-light py-5 vh-100">
-      <Nav className="flex-column">
-        <Nav.Link href="/home" className="text-dark">
-          New Sales Order
-        </Nav.Link>
-        <Nav.Link href="/home" className="text-dark">
-          List of Sales Orders
-        </Nav.Link>
-      </Nav>
-    </Col>
+    <div className="sidebar">
+      <ul>
+        <li>
+          <NavLink to="/salesorders/new">New Sales Order</NavLink>
+        </li>
+        <li>
+          <NavLink to="/salesorders">View Sales Orders</NavLink>
+        </li>
+      </ul>
+    </div>
   );
 };
 
