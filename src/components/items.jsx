@@ -153,8 +153,7 @@ class Items extends Component {
 
     return (
       <React.Fragment>
-        <Col xl="2"></Col>
-        <Col className="p-5 w-75" xl="8" md="12">
+        <Col className="p-5 w-100">
           <h2>Items</h2>
           <Row className="justify-content-between">
             <Button

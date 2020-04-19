@@ -7,7 +7,7 @@ import { ToastContainer } from "react-toastify";
 import auth from "./services/authService";
 import NavigationBar from "./components/navigationBar";
 import Login from "./components/login";
-import SideNav from "./components/sideNav";
+import SideBar from "./components/sideBar";
 import SalesOrder from "./components/salesOrder";
 import NewSalesOrder from "./components/newSalesOrder";
 import Items from "./components/items";
@@ -35,7 +35,7 @@ class App extends Component {
         <ToastContainer />
         <Container fluid>
           <Row>
-            <Route path="/salesorders" component={SideNav} />
+            <SideBar />
             <Switch>
               <Route path="/login" component={Login} />
               <Route path="/logout" component={Logout} />
@@ -47,7 +47,7 @@ class App extends Component {
               <ProtectedRoute path="/customers" component={Customers} />
               <ProtectedRoute path="/items" component={Items} />
               <ProtectedRoute path="/users" component={Users} />
-              <ProtectedRoute path="/" exact component={Customers} />
+              <ProtectedRoute path="/" exact component={SalesOrder} />
               <Redirect to="/not-found" component={NotFound} />
             </Switch>
           </Row>

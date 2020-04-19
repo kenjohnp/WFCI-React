@@ -1,4 +1,8 @@
 /** @format */
+html,
+body {
+  height: 100%;
+}
 
 body {
   margin: 0;
@@ -35,31 +39,51 @@ code {
 }
 
 .sidebar {
-  background-color: #fff;
+  background-color: #343a40 !important;
   border-right: 1px solid #ddd;
   width: 250px;
-  height: 100vh;
   left: 0;
 }
 
 .sidebar ul {
   list-style: none;
-  margin-top: 30px;
   padding-inline-start: 0;
 }
 
 .sidebar ul li {
-  border-bottom: 1px solid #eee;
   cursor: pointer;
 }
 
 .sidebar ul li:hover {
-  background-color: #eee;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .sidebar ul li a {
   text-decoration: none;
-  color: #000;
+  color: #fff;
   padding: 10px 20px;
   display: block;
+}
+
+.sidenav {
+  background-color: #343a40 !important;
+  width: 100%;
+  text-align: left;
+  padding: 15px 20px;
+  box-shadow: 0px 0px 0px transparent;
+  border: 0px;
+  border-bottom: 1px solid #333;
+  color: white;
+}
+
+.sidenav:hover,
+.sidenav-active {
+  background-color: #191919 !important;
+}
+
+.sidenav:focus {
+  outline: none;
+}
+
+.sideNav-sub {
 }

@@ -12,6 +12,7 @@ class SoDetails extends Component {
       salesOrder,
       onChangeDate,
       onChange,
+      readOnly,
     } = this.props;
 
     return (
@@ -25,6 +26,8 @@ class SoDetails extends Component {
                   options={options}
                   value={selectedCustomer}
                   onChange={onChangeCustomer}
+                  menuIsOpen={readOnly ? false : undefined}
+                  isSearchable={!readOnly}
                 />
               </Form.Group>
             </Form.Row>
@@ -35,6 +38,7 @@ class SoDetails extends Component {
                   className="form-control"
                   selected={salesOrder.date}
                   onChange={onChangeDate}
+                  readOnly={readOnly}
                 />
               </Form.Group>
               <Form.Group as={Col} md="3">
@@ -43,6 +47,7 @@ class SoDetails extends Component {
                   onChange={onChange}
                   value={salesOrder.soRefNo}
                   name="soRefNo"
+                  readOnly={readOnly}
                 ></Form.Control>
               </Form.Group>
               <Form.Group as={Col} md="3">
@@ -51,6 +56,7 @@ class SoDetails extends Component {
                   onChange={onChange}
                   value={salesOrder.remarks}
                   name="remarks"
+                  readOnly={readOnly}
                 ></Form.Control>
               </Form.Group>
             </Form.Row>
