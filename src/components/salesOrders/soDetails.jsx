@@ -48,6 +48,7 @@ class SoDetails extends Component {
                   value={salesOrder.soRefNo}
                   name="soRefNo"
                   readOnly={readOnly}
+                  autoComplete={"off"}
                 ></Form.Control>
               </Form.Group>
               <Form.Group as={Col} md="3">
@@ -57,6 +58,7 @@ class SoDetails extends Component {
                   value={salesOrder.remarks}
                   name="remarks"
                   readOnly={readOnly}
+                  autoComplete={"off"}
                 ></Form.Control>
               </Form.Group>
             </Form.Row>

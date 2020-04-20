@@ -29,6 +29,7 @@ class NewSalesOrderHelper extends Component {
           }
           menuIsOpen={this.state.readOnly ? false : undefined}
           isSearchable={!this.state.readOnly}
+          maxMenuHeight={150}
         />
       ),
     },
@@ -47,7 +48,7 @@ class NewSalesOrderHelper extends Component {
               this.state.salesOrder.soItems.indexOf(item)
             )
           }
-          readOnly={this.state.readOnly}
+          readOnly={this.state.readOnly || item.item === ""}
         />
       ),
     },
@@ -60,7 +61,7 @@ class NewSalesOrderHelper extends Component {
           min="0"
           name="price"
           value={item.price}
-          readOnly={this.state.readOnly}
+          readOnly={this.state.readOnly || item.item === ""}
           onChange={(currentTarget) =>
             this.handleChangeItemDetails(
               currentTarget,

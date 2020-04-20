@@ -13,10 +13,12 @@ const SideBar = () => {
           {
             label: "New Sales Order",
             link: "/salesorders/new",
+            icon: "fa fa-pencil-square-o fa-fw",
           },
           {
             label: "View Sales Orders",
             link: "/salesorders",
+            icon: "fa fa-history fa-fw",
           },
         ],
       },
@@ -27,12 +29,14 @@ const SideBar = () => {
         icon: "fa fa-truck fa-lg fa-fw",
         subMenu: [
           {
-            label: "New Delivery Receipts",
+            label: "New Delivery Receipt",
             link: "Link Here",
+            icon: "fa fa-pencil-square-o fa-fw",
           },
           {
             label: "View Delivery Receipts",
             link: "Link Here",
+            icon: "fa fa-history fa-fw",
           },
         ],
       },
@@ -45,10 +49,12 @@ const SideBar = () => {
           {
             label: "New Sales Invoice",
             link: "Link Here",
+            icon: "fa fa-pencil-square-o fa-fw",
           },
           {
             label: "View Sales Invoices",
             link: "Link Here",
+            icon: "fa fa-history fa-fw",
           },
         ],
       },
@@ -61,10 +67,12 @@ const SideBar = () => {
           {
             label: "New Collections",
             link: "Link Here",
+            icon: "fa fa-pencil-square-o fa-fw",
           },
           {
             label: "View Collections",
             link: "Link Here",
+            icon: "fa fa-history fa-fw",
           },
         ],
       },
@@ -104,7 +112,7 @@ const SideBar = () => {
     {
       menu: {
         label: "Manage Users",
-        icon: "fa fa-user fa-lg fa-fw",
+        icon: "fa fa-users fa-lg fa-fw",
         subMenu: [],
         link: "/users",
       },
@@ -117,7 +125,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className="sidebar pt-5 vh-100">
+    <div className="sidebar pt-3 vh-100">
       <Accordion>
         {sideMenu.map((m, index) => (
           <SideNav

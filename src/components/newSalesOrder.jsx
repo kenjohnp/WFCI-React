@@ -62,8 +62,6 @@ class NewSalesOrder extends NewSalesOrderHelper {
       buttonGroup,
     } = this.state;
 
-    const { match } = this.props;
-
     return (
       <Col className="mt-3">
         {Object.values(errors)[0] && (
