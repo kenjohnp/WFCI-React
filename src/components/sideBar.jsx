@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Accordion } from "react-bootstrap";
+import { Accordion, Navbar } from "react-bootstrap";
 import SideNav from "./common/sideNav";
 
-const SideBar = () => {
-  const [activeIndex, setActiveIndex] = useState(-1);
+const SideBar = ({ hideSideBar }) => {
+  const [activeIndex] = useState(-1);
   const sideMenu = [
     {
       menu: {
@@ -30,7 +30,7 @@ const SideBar = () => {
         subMenu: [
           {
             label: "New Delivery Receipt",
-            link: "Link Here",
+            link: "/deliveryreceipts/new",
             icon: "fa fa-pencil-square-o fa-fw",
           },
           {
@@ -117,15 +117,30 @@ const SideBar = () => {
         link: "/users",
       },
     },
+    {
+      menu: {
+        label: "Logout",
+        icon: "fa fa-power-off fa-lg fa-fw",
+        subMenu: [],
+        link: "/logout",
+      },
+    },
   ];
 
-  const handleClick = (index) => {
-    console.log("clicked", index);
-    // setActiveIndex(index);
-  };
+  const handleClick = (index) => {};
 
   return (
-    <div className="sidebar pt-3 vh-100">
+    <div className="sidebar pt-2">
+      <div className="mb-3">
+        <input type="checkbox" id="check" />
+        <label htmlFor="check" className="ml-3 mb-0 text-white">
+          <i className="fa fa-bars fa-lg mr-2" id="btn"></i>
+          <Navbar.Brand id="btn" className="m-0">
+            WFCI
+          </Navbar.Brand>
+        </label>
+      </div>
+
       <Accordion>
         {sideMenu.map((m, index) => (
           <SideNav
@@ -134,6 +149,7 @@ const SideBar = () => {
             key={index}
             active={activeIndex === index}
             onClick={() => handleClick(index)}
+            hideSideBar={hideSideBar}
           />
         ))}
       </Accordion>

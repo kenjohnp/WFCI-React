@@ -29,9 +29,11 @@ class NewSalesOrder extends NewSalesOrderHelper {
     },
     errors: {},
     readOnly: false,
+    isMounted: false,
   };
 
   componentDidMount() {
+    this.setState({ isMounted: true });
     this.populateSelect();
     this.populateSalesOrder();
     this.populateButtonGroup();
@@ -46,7 +48,9 @@ class NewSalesOrder extends NewSalesOrderHelper {
     }
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() {
+    this.setState({ isMounted: false });
+  }
 
   IsReadOnly() {
     const readOnly = this.props.match.params.id === "new" ? false : true;
@@ -63,13 +67,13 @@ class NewSalesOrder extends NewSalesOrderHelper {
     } = this.state;
 
     return (
-      <Col className="mt-3">
+      <Col className="mt-5">
         {Object.values(errors)[0] && (
           <Alert variant="danger">{Object.values(errors)[0]}</Alert>
         )}
-        <h4>New Sales Order</h4>
 
         <Card body className="mb-3">
+          <h4>New Sales Order</h4>
           <ButtonGroup buttons={buttonGroup} styleClass="mb-3" />
           <SoDetails
             options={customerOptions}

@@ -20,47 +20,55 @@ class SoDetails extends Component {
         <Col>
           <Form>
             <Form.Row>
-              <Form.Group as={Col} md="9">
-                <Form.Label>Customer</Form.Label>
-                <Select
-                  options={options}
-                  value={selectedCustomer}
-                  onChange={onChangeCustomer}
-                  menuIsOpen={readOnly ? false : undefined}
-                  isSearchable={!readOnly}
-                />
-              </Form.Group>
+              <Col>
+                <Form.Group>
+                  <Form.Label>Customer</Form.Label>
+                  <Select
+                    options={options}
+                    value={selectedCustomer}
+                    onChange={onChangeCustomer}
+                    menuIsOpen={readOnly ? false : undefined}
+                    isSearchable={!readOnly}
+                  />
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group>
+                  <Form.Label>Date</Form.Label>
+                  <DatePicker
+                    className="form-control"
+                    selected={salesOrder.date}
+                    onChange={onChangeDate}
+                    readOnly={readOnly}
+                  />
+                </Form.Group>
+              </Col>
             </Form.Row>
             <Form.Row>
-              <Form.Group as={Col} md="3">
-                <Form.Label>Date</Form.Label>
-                <DatePicker
-                  className="form-control"
-                  selected={salesOrder.date}
-                  onChange={onChangeDate}
-                  readOnly={readOnly}
-                />
-              </Form.Group>
-              <Form.Group as={Col} md="3">
-                <Form.Label>SO Reference No.</Form.Label>
-                <Form.Control
-                  onChange={onChange}
-                  value={salesOrder.soRefNo}
-                  name="soRefNo"
-                  readOnly={readOnly}
-                  autoComplete={"off"}
-                ></Form.Control>
-              </Form.Group>
-              <Form.Group as={Col} md="3">
-                <Form.Label>Remarks</Form.Label>
-                <Form.Control
-                  onChange={onChange}
-                  value={salesOrder.remarks}
-                  name="remarks"
-                  readOnly={readOnly}
-                  autoComplete={"off"}
-                ></Form.Control>
-              </Form.Group>
+              <Col>
+                <Form.Group>
+                  <Form.Label>SO Reference No.</Form.Label>
+                  <Form.Control
+                    onChange={onChange}
+                    value={salesOrder.soRefNo}
+                    name="soRefNo"
+                    readOnly={readOnly}
+                    autoComplete={"off"}
+                  ></Form.Control>
+                </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group>
+                  <Form.Label>Remarks</Form.Label>
+                  <Form.Control
+                    onChange={onChange}
+                    value={salesOrder.remarks}
+                    name="remarks"
+                    readOnly={readOnly}
+                    autoComplete={"off"}
+                  ></Form.Control>
+                </Form.Group>
+              </Col>
             </Form.Row>
           </Form>
         </Col>

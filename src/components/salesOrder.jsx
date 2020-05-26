@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Table, Button } from "react-bootstrap";
+import { Row, Col, Table } from "react-bootstrap";
 import _ from "lodash";
 import moment from "moment";
 import { paginate } from "../utils/paginate";
@@ -49,11 +49,9 @@ class SalesOrder extends Component {
   async componentDidMount() {
     const { data } = await getSalesOrders();
 
-    for (let i = 0; i < data.length; i++) {
-      data[i].soDate = moment(data[i].soDate).format("MM/DD/YYYY");
-      data[i].dateModified = moment(data[i].dateModified).format(
-        "MM/DD/YYYY h:mm a"
-      );
+    for (let item of data) {
+      item.soDate = moment(item.soDate).format("MM/DD/YYYY");
+      item.dateModified = moment(item.dateModified).format("MM/DD/YYYY h:mm a");
     }
 
     this.setState({ salesOrders: data });

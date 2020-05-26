@@ -199,7 +199,9 @@ class NewSalesOrderHelper extends Component {
       value: i._id,
     }));
 
-    this.setState({ customers, customerOptions, items, itemsOptions });
+    if (this.state.isMounted) {
+      this.setState({ customers, customerOptions, items, itemsOptions });
+    }
   }
 
   async populateSalesOrder() {
@@ -209,8 +211,10 @@ class NewSalesOrderHelper extends Component {
 
       const { data: salesOrder } = await getSalesOrder(soId);
 
-      this.setState({ salesOrder: this.mapToViewModel(salesOrder) });
-      this.computeTotalAmount();
+      if (this.state.isMounted) {
+        this.setState({ salesOrder: this.mapToViewModel(salesOrder) });
+        this.computeTotalAmount();
+      }
     } catch (ex) {
       if (ex.response && ex.response.status === 404)
         this.props.history.replace("/not-found");
@@ -241,9 +245,9 @@ class NewSalesOrderHelper extends Component {
 
   resetIndex = () => {
     let salesOrder = this.state.salesOrder;
-    for (let i = 0; i < salesOrder.soItems.length; i++) {
+    for (let i = 0; i < salesOrder.soItems.length; i++)
       salesOrder.soItems[i].index = i;
-    }
+
     this.setState({ salesOrder });
   };
 

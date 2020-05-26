@@ -10,7 +10,9 @@ class TableBody extends Component {
   };
 
   createKey = (item, column) => {
-    return (item._id || item.value + item.index) + (column.path || column.key);
+    return (
+      (item._id || `${item.value}${item.index}`) + (column.path || column.key)
+    );
   };
 
   handleClick = (item) => {

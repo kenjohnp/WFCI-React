@@ -40,9 +40,16 @@ code {
 
 .sidebar {
   background-color: #343a40 !important;
-  border-right: 1px solid #ddd;
   width: 250px;
-  left: 0;
+  left: -250px;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  position: fixed;
+  transition: all 0.5s ease;
+  z-index: 1200;
+  visibility: visible;
+  padding: 1rem 0rem;
 }
 
 .sidebar ul {
@@ -70,10 +77,10 @@ code {
   width: 100%;
   text-align: left;
   padding: 15px 20px;
-  box-shadow: 0px 0px 0px transparent;
   border: 0px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #343434;
   color: white;
+  transition: all 0.3s ease;
 }
 
 .sidenav:hover,
@@ -83,4 +90,38 @@ code {
 
 .sidenav:focus {
   outline: none;
+}
+
+#check {
+  display: none;
+}
+
+label #btn {
+  cursor: pointer;
+}
+#check:checked ~ .sidebar {
+  left: 0;
+}
+
+.main-content {
+  transition: all 0.5s ease;
+}
+
+.dimmer {
+  background-color: rgba(0, 0, 0, 0.3);
+  display: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1199;
+}
+
+#check:checked ~ .dimmer {
+  display: block;
+}
+
+.itemsCheckBox {
+  width: 15px;
+  height: 15px;
 }

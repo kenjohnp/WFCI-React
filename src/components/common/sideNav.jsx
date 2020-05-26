@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink, Link } from "react-router-dom";
 import { Accordion } from "react-bootstrap";
 
-function SideNav({ menu, eventKey, active, onClick, currentPath }) {
+function SideNav({ menu, eventKey, active, onClick, hideSideBar }) {
   const accordion = (
     <Accordion.Toggle
       eventKey={eventKey}
@@ -29,7 +29,7 @@ function SideNav({ menu, eventKey, active, onClick, currentPath }) {
         <ul className="m-0">
           {menu.subMenu.map((menu, index) => (
             <li key={index}>
-              <NavLink to={menu.link}>
+              <NavLink to={menu.link} onClick={hideSideBar}>
                 <i className={menu.icon}></i>
                 <span> {menu.label}</span>
               </NavLink>
